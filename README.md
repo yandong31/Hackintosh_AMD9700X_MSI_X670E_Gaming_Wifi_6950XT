@@ -1,25 +1,25 @@
-# 锐龙黑苹果 - 华硕电竞特工B550M Opencore引导文件
+# 锐龙黑苹果 - 微星X670E Opencore引导文件
 
 [**English**](README_en.md)| [**中文**](README.md)
 
 ## 硬件配置
 | **组件** | **型号** |
 | ------------- | --------- |
-| CPU | AMD 锐龙5 5600X @ 3.6GHz OC|
-| 主版 | 华硕 电竞特工 TUF Gaming B550M-Plus |
-| 内存 | 英睿达 DDR4 16GB (2 x 8GB) @3600(OC3800)|
-| 声卡 | 瑞昱 ALCS-1200A |
-| 显卡 | 迪兰恒进 RX 5500XT 8G |
-| 网卡 | 瑞昱 RTL8125 2.5GbE |
+| CPU | AMD 锐龙7 9700X @ 3.6GHz |
+| 主版 | 微星 X670E GAMING WIFI |
+| 内存 | 光威龙武 DDR5 32GB (2 x 16GB) @5600MHz|
+| 声卡 | 瑞昱 ALC-897 |
+| 显卡 | 讯景 RX 6950 XT 16G |
+| 网卡 | 瑞昱 RTL8125B 2.5GbE |
 | WiFi蓝牙 | 博通 BMC94360CD |
-| 电源 | 追风者 Revolt PRO 850W |
-| 系统硬盘 | 惠普 S700 128G |
+| 电源 | 海韵 锋睿 PX1000 1000W |
+| 系统硬盘 | 铠侠 SSD 500G |
 
 **macOS 版本**: 13.2  (22D49) 
 
-**OpenCore 版本**: 0.8.8
+**OpenCore 版本**: 1.0.5
 
-**机型**:  iMacPro1,1
+**机型**:  MacPro7,1
 
 ## 目录
  - [更新日志](#更新日志)
@@ -35,24 +35,14 @@
 
 
 ## 更新日志
-- 2023-02-10
-  1. 系统版本升级到 Ventura 13.2
-  2. OpenCore更新到0.8.8
-  3. 更新Liu到1.6.3
-  4. 更新RTCMemoryFixup到1.0.7
-  5. 更新RestrictEvents到1.0.9
-  6. 更新VirtualSMC到1.3.0
-  7. 更新WhateverGreen到1.6.3
-  8. 更新**[AMD_Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)**补丁为2023.02.05最新补丁
-- 2021-01-28
-  1. 系统版本升级到 Monetery 12.2
-  2. OpenCore更新到0.7.7
-  3. 定制并自编译AppleALC，记录[定制过程](用AppleALC定制声卡记录.md)。
-- 2021-01-20
-  1. 系统版本升级到12.1
-  2. 更换并适配了opencore主题
-  3. 主板更换为不带WIFI版本，加装BMC94360CD免驱卡。
-  4. 修复HP SSD未开启Trim 系统卡顿的问题。
+- 2025-10-23
+1. 使用ACPI定制usb，生成SSDT-XHUB.aml,弃用USBMap.kext
+2. 使用修改过的DSDT：DSDT-fix1107.aml，将新版Bios判断语句全部删除，成功加载板载网卡。(使用ACPI debug获得 G000 、G001 、G002等变量的值，并根据得到的值计算判断语句是否成立，进而决定删除整个代码块还是只是去除判断条件。）
+3. 使用SSDT-Basic-AM5.aml通用补丁，包含CPUR、USBX、RTC、EC0、禁用不支持集显（我是直接主板关闭了）、USB修复等功能。
+4. 定制AppleALC.kext，版本1.9.5。  实现扬声器和耳机分离。
+5. 启用MMIOWHiteList白名单。实现原生NVRAM。
+6. 在所有USB控制器添加 acpi-wake-type | Data | 01 以改善鼠标键盘唤醒需要2次的问题， 目前测试效果有限。
+7. 添加 Disable RTC wake scheduling 补丁解决 定期唤醒问题。
 
 
 ## 驱动和扩展
@@ -71,7 +61,7 @@
  - [[扩展] AppleMCEReporterDisabler 关闭AppleMCERReport](https://github.com/AMD-OSX/AMD_Vanilla/raw/master/Extra/AppleMCEReporterDisabler.kext.zip)
  - [[扩展] LucyRTL8125Ethernet 2.5G有线网卡驱动](https://github.com/Mieze/LucyRTL8125Ethernet)
  - [[扩展] AMDRyzenCPUPowerManagement](https://github.com/trulyspinach/SMCAMDProcessor)
- - [[扩展] SMCAMDProcessor](https://github.com/trulyspinach/SMCAMDProcessor)
+ - [[扩展] SMCProcessorAMD](https://github.com/macos86/SMCProcessorAMD)
  - [[扩展] NVMeFix](https://github.com/acidanthera/NVMeFix)
  - [[扩展] RestrictEvents](https://github.com/acidanthera/RestrictEvents)
  - [[扩展] Innie](https://github.com/cdf/Innie/releases)
@@ -110,7 +100,7 @@
 | **Option** | **Status** |
 | ------------- | --------- |
 | SATA 模式 | AHCI |
-| Above 4G Decoding | 开启 <sup>1</sup> |
+| Above 4G Decoding | 开启  |
 | EHCI/XHCI Hand-off | 开启 |
 | SVM | 开启 |
 | CSM | 关闭 |
@@ -118,11 +108,9 @@
 | 安全启动 | 关闭 |
 | 串口 | 关闭 |
 | Parallel Port | 关闭 |
-| TPM Device | 关闭 <sup>2</sup>|
+| TPM Device | 关闭 <sup>1</sup>|
 
-<sup>1</sup> 这里如果开启的话,**必须**在config.plist配置文件的`boot-args`项中删除  `npci=0x2000`启动参数,不过推荐主板关闭,使用参数
-
-<sup>2</sup> TPM安装阶段关闭,安装完成后可以开启,特别是win11双系统的话,不开启无法启动win11
+<sup>1</sup> TPM安装阶段关闭,安装完成后可以开启,特别是win11双系统的话,不开启无法启动win11
 
 **这些选项大多可能不存在于您的主板bios选项中，只需尽可能接近即可。如果您的BIOS中没有其中许多选项，请不要太担心**
 
@@ -222,9 +210,3 @@ Parallels Desktop 13.1
  - 故障诊断: [**\*点击\***](https://dortania.github.io/OpenCore-Post-Install/)
  - ACPI补丁: [**\*点击\***](https://dortania.github.io/Getting-Started-With-ACPI/)
  - USB映射: [**\*点击\***](https://dortania.github.io/OpenCore-Post-Install/usb/)
-
-
-
-
-
- 

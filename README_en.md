@@ -1,109 +1,102 @@
-# AMD Ryzen Hackintosh - Opencore EFI for Asus TUF Gaming B550M-Plus
+# Ryzentosh - MSI X670E Opencore EFI
 
 [**English**](README_en.md)| [**中文**](README.md)
 
-## Specification
+## Hardware Configuration
 | **Component** | **Model** |
 | ------------- | --------- |
-| CPU | AMD Ryzen 5 5600X @ 3.6GHz OC|
-| Motherboard | Asus TUF Gaming B550M-Plus |
-| RAM | Crucial  DDR4 16GB (2 x 8GB) @3600(OC3800)|
-| Audio Chipset | ALCS-1200A |
-| GPU | DATALAND  RX 5500XT 8G |
-| Ethernet | RTL8125 2.5GbE |
+| CPU | AMD Ryzen 7 9700X @ 3.6GHz |
+| Motherboard | MSI X670E GAMING WIFI |
+| RAM | Gloway Dragon DDR5 32GB (2 x 16GB) @5600MHz |
+| Audio | Realtek ALC-897 |
+| GPU | XFX RX 6950 XT 16G |
+| Ethernet | Realtek RTL8125B 2.5GbE |
 | WiFi & Bluetooth | Broadcom BMC94360CD |
-| OPOWER SUPPLY) | PHANTEKS  Revolt PRO 850W |
-| OS Disk (SATA) | HP S700 128G |
+| PSU | Seasonic Vertex PX-1000 1000W |
+| OS Drive | Kioxia SSD 500G |
 
-**macOS version**: 13.2  (22D49) 
+**macOS Version**: 13.2 (22D49)
 
-**OpenCore version**: 0.8.8
+**OpenCore Version**: 1.0.5
 
-**SMBIOS**:  iMacPro1,1
+**SMBIOS**: MacPro7,1
 
-## Table of content
- - [Update log](#Update-log)
- - [Drivers & Kexts](#Drivers-and-Kexts)
- - [How to use](#How-to-use)
- - [BIOS Settings](#BIOS-Settings)
- - [Hardware compatibility](#Hardware-compatibility)
- - [Sleep information](#Sleep-information)
- - [PAT patch information](#PAT-patch-information)
- - [Adobe applications fix](#Adobe-applications-fix)
- - [Virtualization](#Virtualization)
- - [Guides](#Guides)
+## Table of Contents
+- [Changelog](#changelog)
+- [Drivers and Kexts](#drivers-and-kexts)
+- [How to Use](#how-to-use)
+- [BIOS Settings](#bios-settings)
+- [Compatibility](#compatibility)
+- [Sleep Information](#sleep-information)
+- [PAT Patch Information](#pat-patch-information)
+- [Adobe Software Fix](#adobe-software-fix)
+- [Virtualization](#virtualization)
+- [Installation Guides](#installation-guides)
 
-## Update log
-
-- 2023-02-10
-  1. System version upgrade to Ventura 13.2
-  2.  Updated OpenCore to 0.8.8
-  3.  Update Liu.kext  to 1.6.3
-  4.  Update RTCMemoryFixup.kext to 1.0.7
-  5.  Update RestrictEvents.kext  to 1.0.9
-  6.  Update VirtualSMC.kext to 1.3.0
-  7.  Update WhateverGreen.kext to 1.6.3
-  8.  Update **[AMD_Vanilla patch](https://github.com/AMD-OSX/AMD_Vanilla)** to the latest 2023.02.05
-- 2021-01-28
-  1. System version upgraded to Monetery 12.2
-  2.  Updated OpenCore to 0.7.7
-  3. Customize and self-compile AppleALC, and record the [customization process](用AppleALC定制声卡记录.md).
-- 2021-01-20
-  1. The system version is upgraded to 12.1
-  2. Replaced and adapted the opencore theme.
-  3. The motherboard is replaced with a version without WIFI, and a BMC94360CD free drive card is installed.
-  4. Fixed the system freeze problem when HP SSD did not enable Trim.
+## Changelog
+- 2025-10-23
+1.  Customized USB via ACPI, generated SSDT-XHUB.aml, deprecated USBMap.kext.
+2.  Used modified DSDT: DSDT-fix1107.aml, removed all new BIOS conditional statements, successfully loaded onboard Ethernet. (Used ACPI debug to obtain values for variables like G000, G001, G002, calculated whether the condition held true, and then decided to either remove the entire code block or just the conditional check.)
+3.  Used SSDT-Basic-AM5.aml universal patch, includes CPUR, USBX, RTC, EC0, disables unsupported iGPU (I disabled it directly in BIOS), USB fixes, etc.
+4.  Customized AppleALC.kext, version 1.9.5. Achieved separation of speakers and headphone jack.
+5.  Enabled MMIOWHiteList for native NVRAM.
+6.  Added `acpi-wake-type | Data | 01` to all USB controllers to improve the issue where mouse/keyboard wake requires two attempts. Current testing shows limited effect.
+7.  Added "Disable RTC wake scheduling" patch to resolve periodic wake issues.
 
 ## Drivers and Kexts
+- [[Bootloader] OpenCore](https://github.com/acidanthera/OpenCorePkg)
+- [[Resources] Picker GUI](https://github.com/acidanthera/OcBinaryData/tree/master/Resources)
+- [[Patch] AMD_Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
+- [[Driver] FwRuntimeServices](https://github.com/acidanthera/OpenCorePkg)
+- [[Driver] HfsPlus](https://github.com/acidanthera/OcBinaryData/blob/master/Drivers/HfsPlus.efi)
+- [[Driver] OpenHfsPlus](https://github.com/acidanthera/OpenCorePkg)
+- [[Driver] OpenRuntime](https://github.com/acidanthera/OpenCorePkg)
+- [[Driver] OpenCanopy](https://github.com/acidanthera/OpenCorePkg)
+- [[Kext] Lilu](https://github.com/acidanthera/Lilu)
+- [[Kext] VirtualSMC](https://github.com/acidanthera/VirtualSMC)
+- [[Kext] WhateverGreen](https://github.com/acidanthera/WhateverGreen)
+- [[Kext] AppleALC Audio Driver](https://github.com/acidanthera/AppleALC)
+- [[Kext] AppleMCEReporterDisabler Disable AppleMCERReport](https://github.com/AMD-OSX/AMD_Vanilla/raw/master/Extra/AppleMCEReporterDisabler.kext.zip)
+- [[Kext] LucyRTL8125Ethernet 2.5G Ethernet Driver](https://github.com/Mieze/LucyRTL8125Ethernet)
+- [[Kext] AMDRyzenCPUPowerManagement](https://github.com/trulyspinach/SMCAMDProcessor)
+- [[Kext] SMCProcessorAMD](https://github.com/macos86/SMCProcessorAMD)
+- [[Kext] NVMeFix](https://github.com/acidanthera/NVMeFix)
+- [[Kext] RestrictEvents](https://github.com/acidanthera/RestrictEvents)
+- [[Kext] Innie](https://github.com/cdf/Innie/releases)
+- [[SSDT] EC-USBX-DESKTOP](https://github.com/dortania/Getting-Started-With-ACPI/blob/master/extra-files/compiled/SSDT-EC-USBX-DESKTOP.aml)
+- [[Tool] GenSMBIOS](https://github.com/corpnewt/GenSMBIOS)
+- [[Tool] OpenCore Online Editor](https://galada.gitee.io/opencoreconfiguratoronline/)
+- [[Tool] PlistEdit Pro (Mac)](https://www.macwk.com/soft/plistedit)
+- [[Tool] Hackintool](https://github.com/headkaze/Hackintool)
+- [[Tool] OpenCore Configurator (Mac)](https://www.macwk.com/soft/opencore-configurator)
+- [[Tool] gibmacOS](https://github.com/corpnewt/gibMacOS)
+- [[Tool] MaciASL](https://github.com/acidanthera/MaciASL)
+- [[Tool] OCConfigCompare](https://github.com/corpnewt/OCConfigCompare)
 
- - [[Bootloader] OpenCore](https://github.com/acidanthera/OpenCorePkg)
- - [[Resources] Picker GUI](https://github.com/acidanthera/OcBinaryData/tree/master/Resources)
- - [[Patch] AMD_Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
- - [[Driver] FwRuntimeServices](https://github.com/acidanthera/OpenCorePkg)
- - [[Driver] HfsPlus](https://github.com/acidanthera/OcBinaryData/blob/master/Drivers/HfsPlus.efi)
- - [[Driver] OpenHfsPlus](https://github.com/acidanthera/OpenCorePkg)
- - [[Driver] OpenRuntime](https://github.com/acidanthera/OpenCorePkg)
- - [[Driver] OpenCanopy](https://github.com/acidanthera/OpenCorePkg)
- - [[Kext] Lilu](https://github.com/acidanthera/Lilu)
- - [[Kext] VirtualSMC](https://github.com/acidanthera/VirtualSMC)
- - [[Kext] WhateverGreen](https://github.com/acidanthera/WhateverGreen)
- - [[Kext] AppleALC ](https://github.com/acidanthera/AppleALC)
- - [[Kext] AppleMCEReporterDisabler ](https://github.com/AMD-OSX/AMD_Vanilla/raw/master/Extra/AppleMCEReporterDisabler.kext.zip)
- - [[Kext] LucyRTL8125Ethernet ](https://github.com/Mieze/LucyRTL8125Ethernet)
- - [[Kext] AMDRyzenCPUPowerManagement](https://github.com/trulyspinach/SMCAMDProcessor)
- - [[Kext] SMCAMDProcessor](https://github.com/trulyspinach/SMCAMDProcessor)
- - [[Kext] NVMeFix](https://github.com/acidanthera/NVMeFix)
- - [[Kext] RestrictEvents](https://github.com/acidanthera/RestrictEvents)
- - [[Kext] Innie](https://github.com/cdf/Innie/releases)
- - [[SSDT] EC-USBX-DESKTOP](https://github.com/dortania/Getting-Started-With-ACPI/blob/master/extra-files/compiled/SSDT-EC-USBX-DESKTOP.aml)
- - [[Tool] GenSMBIOS](https://github.com/corpnewt/GenSMBIOS)
- - [[Tool] OpencoreConfiguratoronline](https://galada.gitee.io/opencoreconfiguratoronline/)
- - [[Tool] PlistEdit Pro（Mac）](https://www.macwk.com/soft/plistedit)
- - [[Tool] Hackintool](https://github.com/headkaze/Hackintool)
- - [[Tool] OpenCore Configurator（Mac）](https://www.macwk.com/soft/opencore-configurator)
- - [[Tool] gibmacOS](https://github.com/corpnewt/gibMacOS)
- - [[Tool] MaciASL](https://github.com/acidanthera/MaciASL)
- - [[Tool] OCConfigCompare](https://github.com/corpnewt/OCConfigCompare)
+## How to Use
+  1.  Use [**this guide**](https://dortania.github.io/OpenCore-Install-Guide/installer-guide/) to create a USB installer.
+  2.  Clone this repository and copy the "BOOT" and "OC" directories into the "EFI" folder on your boot drive.
+  3.  Download [**GenSMBIOS**](https://github.com/corpnewt/GenSMBIOS) to generate unique SMBIOS information. Run it, select "Generate SMBIOS", and choose `iMacPro1,1` as the model.
+  4.  Open `config.plist` using [**ProperTree**](https://github.com/corpnewt/ProperTree). Navigate to `PlatformInfo > Generic`. Set `MLB` (Main Logic Board Serial), `SystemSerialNumber` (Serial), and `SystemUUID` (SmUUID) to the generated values. Change `ROM` to your network card's MAC address without colons. [**How to find MAC address?**](https://www.wikihow.com/Find-the-MAC-Address-of-Your-Computer)
+  5.  Update your BIOS to the latest version and set the BIOS settings to the [**required values**](#bios-settings).
+  6.  Read the [**information**](#compatibility) about required changes for specific hardware.
+  7.  Boot and install macOS!
+  8.  After installation, you can copy the EFI directory to the EFI partition of your disk - then you can boot macOS without the USB drive.
+  9.  If dual-booting, you must enable `Bootstrap` to protect your OpenCore from being overwritten by Windows bootloader. Click for more [**information**](https://dortania.github.io/OpenCore-Post-Install/multiboot/bootstrap.html).
 
+  If it doesn't boot correctly, check:
+  1.  In `Kernel -> Quirks`, is `ProvideCurrentCpuInfo` set to `True`? (Must be enabled, otherwise it won't boot).
+  2.  In `Misc -> Security -> SecureBootModel`, is it set to `Disabled`?
+  3.  In `Kernel -> Patch`, has the `algrey - Force cpuid_cores_per_package` patch been modified according to your CPU core count? See [AMD_Vanilla](https://github.com/AMD-OSX/AMD_Vanilla) for details.
 
-## How to use
-  1. Make your USB installer with [**this guide**](https://dortania.github.io/OpenCore-Install-Guide/installer-guide/)
-  2. Clone the repository and paste "BOOT" and "OC" directories into your's pendrive "EFI" folder
-  3. Download [**GenSMBIOS**](https://github.com/corpnewt/GenSMBIOS) to generate unique SMBIOS information. Run it and select **Generate SMBIOS**, as the model select **iMacPro1,1**.
-  4. Open config.plist with [**ProperTree**](https://github.com/corpnewt/ProperTree) and go to PlatformInfo > Generic. Set MLB (Board Serial), SystemSerialNumber (Serial) and SystemUUID (SmUUID) to generated values. Change ROM to your network card's MAC address without the `:` character. [**How to get MAC Address?**](https://www.wikihow.com/Find-the-MAC-Address-of-Your-Computer)
-  5. Update your BIOS to latest version and set it's settings to [**required values**](#BIOS-Settings)
-  6. Read [**information**](#Hardware-compatibility) about required changes for some hardware
-  7. Boot and install it!
-  8. After installation you can copy your EFI directory to disk's EFI partition - then you can boot macOS without pendrive
-  9. If you want to use dual boot you have to enable Bootstrap - it will protect your OpenCore to be overriden by Windows' boot loader. Click [**here**](https://dortania.github.io/OpenCore-Post-Install/multiboot/bootstrap.html) for information about it.
+**The SMBIOS information in this repository has been removed. You must generate and add your own unique SMBIOS. [Generator Tool](https://github.com/corpnewt/GenSMBIOS)**
 
-**You CAN NOT use SMBIOS from this repository, it MUST be unique for every macOS installation**
 ## BIOS Settings
 
 | **Option** | **Status** |
 | ------------- | --------- |
 | SATA Mode | AHCI |
-| Above 4G Decoding | Enabled <sup>1</sup> |
+| Above 4G Decoding | Enabled  |
 | EHCI/XHCI Hand-off | Enabled |
 | SVM | Enabled |
 | CSM | Disabled |
@@ -111,100 +104,101 @@
 | Secure Boot | Disabled |
 | Serial Port | Disabled |
 | Parallel Port | Disabled |
-| TPM Device | Disabled |
+| TPM Device | Disabled <sup>2</sup>|
 
+<sup>1</sup> Disable TPM during the installation phase. It can be enabled after installation, especially for Windows 11 dual-boot, as Windows 11 won't boot without TPM enabled.
 
-<sup>1</sup> If you have this option you **MUST** remove `npci=0x2000` from `boot-args` in `config.plist`
+**Many of these options might not exist in your motherboard's BIOS options, just get as close as possible. Don't worry too much if many of these options aren't in your BIOS.**
 
-**Most of these options may not exist in your firmware, just try to match it as closely as possible. Don't be too concerned if many of these options are not available in your BIOS**
+**Remember to update your BIOS to the latest version before booting macOS**
 
-**Before booting macOS remember to update BIOS to latest version**
+## Compatibility
+Works with most AMD CPUs with 17h and 19h families, all Ryzen series and Athlon 2xxGE.
+Does NOT work with 15h (FX series), 16h (A series), and Threadripper CPUs.
 
-## Hardware compatibility
-Most builds with **17h and 19h (All Ryzen's generations, Athlon 2xxGE)** CPUs with [**macOS compatible peripherals**](https://dortania.github.io/Anti-Hackintosh-Buyers-Guide/CPU.html) should work with EFI from this repository. \
-**Support for 15h (FX series), 16h (A series) and Threadripper CPUs is not covered here.**
+See [**Support List**](https://dortania.github.io/Anti-Hackintosh-Buyers-Guide/CPU.html) for details.
 
-Integrated GPUs **DO NOT WORK**, for NVIDIA check details [**here**](https://dortania.github.io/GPU-Buyers-Guide/modern-gpus/nvidia-gpu.html) (it's not covered in this repository). \
-If you have **NVIDIA GPU** you may have to change PAT Patch to Algrey's version, read [**here**](#PAT-patch-information) about it
+**Integrated Graphics do not work properly**. For NVIDIA GPUs, see [**here**](https://dortania.github.io/GPU-Buyers-Guide/modern-gpus/nvidia-gpu.html).
 
-Motherboards with **B550 and A520** chipsets require additional **SSDT-CPUR** to boot macOS. \
-You have to [**download it**](https://github.com/dortania/Getting-Started-With-ACPI/blob/master/extra-files/compiled/SSDT-CPUR.aml) and put it under `OC/ACPI` directory. Then you have to add it to your config. Open it with ProperTree or your favourite text editor and add it under `ACPI -> Add`. You should do this in the same way as you did `SSDT-EC-USBX-DESKTOP`, just change the name of the file.
+If you are an NVIDIA user, you may need to select the Algrey version of the PAT patch, see [**here**](#pat-patch-information) for details.
 
-For **B550, A520 and B450, X470, X570 with newer BIOS versions** `SetupVirtualMap` must be disabled. Go to `Booter -> Quirks -> SetupVirtualMap` in your config and change it to `false`
+**B550 and A520 motherboards** need to add the **SSDT-CPUR** ACPI patch to boot normally. [**Download**](https://github.com/dortania/Getting-Started-With-ACPI/blob/master/extra-files/compiled/SSDT-CPUR.aml) \
+Download and place it in the `OC/ACPI` directory, then enable it in the `config.plist`.
 
-For **AMD Navi GPUs (RX 5500, 5600, 5700)** you have to add `agdpmod=pikera` to `boot-args` to fix black screen issue.
+**B550, A520 motherboards, and B450, X470, X570 motherboards using the latest BIOS versions** must disable `SetupVirtualMap` in the config. The path is `Booter -> Quirks -> SetupVirtualMap`, set the value to `false`.
 
-If you experience issues with your audio, then you have to change `alcid` proper for your audio chipset. Find your chipset [**here**](https://github.com/acidanthera/applealc/wiki/supported-codecs) and try setting `alcid` in `boot-args` parameter to every layout-id values from AppleALC wiki until you get correct value (working audio inputs and outputs) for your motherboard.
+**AMD Navi GPUs (e.g., RX 5500, 5600, 5700)** should add `agdpmod=pikera` to the `boot-args` to fix black screen issues.
 
-If you experience issues with network connection, then you probably have another ethernet chipset. Click [**here**](https://dortania.github.io/OpenCore-Install-Guide/ktext.html#ethernet) for information about kexts for ethernet cards. \
+If you have audio issues, you must change the `alcid` value to match your motherboard. See [**here**](https://github.com/acidanthera/applealc/wiki/supported-codecs). You can try different layout-id values until your audio works correctly.
 
-By default enabled is PAT patch made by Shaneee - it improves GPU performance but can cause some issues. It can break HDMI audio and make builds with NVIDIA GPU unbootable. You can switch patch with better compatibility (but worse performance). Click [**here**](#PAT-patch-information) for more information.
+If you have network connection issues, it might be that the Ethernet kext is not suitable. Please refer to the manual to find the Ethernet driver for your motherboard. [**See here**](https://dortania.github.io/OpenCore-Install-Guide/ktext.html#ethernet).
 
-## Sleep information
-If you have issues with sleep, firstly you have to map your USB ports. You can read about it [**here**](https://dortania.github.io/OpenCore-Post-Install/usb/). If map does not help, you should try patching USB via SSDT.
+The Shaneee version of the PAT patch is enabled by default, which can provide better GPU performance but may also cause some compatibility issues. If you have compatibility problems, please switch to the other PAT patch. For details, see [**PAT Patch Information**](#pat-patch-information).
 
-In `SSDT-SLEEP.aml` there are patches for _STA method. Patch as applied to `_SB.PCI0.GPP2.PTXH` and `_SB.PCI0.GP17.XHC0` USB controllers, if you have other addresses of USB controllers you have to edit SSDT for your build. Patch is applied only for macOS, so USB on other systems should work normally.
+## Sleep Information
 
-Sleep in AMD systems is often broken by USB issues, but not always. If USB patching does not help read [**this guide**](https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html) about fixing sleep.
+If you have sleep issues, first customize your USB ports. Customization method [**refer here**](https://dortania.github.io/OpenCore-Post-Install/usb/). If customizing USB still doesn't resolve the issue, you should try fixing USB via SSDT.
 
-## PAT patch information
+There are patches in SSDT-SLEEP.aml for patching the `_STA` method. The patches are applied to the `_SB.PCI0.GPP2.PTXH` and `_SB.PCI0.GP17.XHC0` USB controllers. If your USB controllers have other addresses, you must add them to the SSDT. The patch only affects macOS, so USB on other systems is unaffected.
+
+Sleep issues are often caused by USB, but not always. If the USB patch doesn't work, refer to [**this article**](https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html) to fix sleep.
+
+## PAT Patch Information
 | **Shaneee's** | **Algrey's** |
 | ------------- | --------- |
-| Much better GPU performance | Worse GPU performance |
+| Better GPU Performance | Worse GPU Performance |
 | May not work with NVIDIA GPUs | Compatible with all GPUs |
-| HDMI/DP audio may not work | HDMI/DP audio works |
+| HDMI / DP Audio may not work | HDMI/DP Audio works correctly |
 | Enabled by default | Disabled by default |
 
-To switch to another patch search for `mtrr_update_action` in `config.plist`. Then set `Enabled` to `true` for patch which you want to use. Remember to set `Enabled` to `false` for second PAT patch.
+To switch to the other patch, search for `mtrr_update_action` in `config.plist`. Then set `Enable` to `TRUE` for the patch you want to use and `FALSE` for the other.
 
-**Don't try to use them both at the same time, it won't work.**
+Do not try to use both patches simultaneously; one must be disabled.
 
-## Adobe applications fix
-Adobe applications crash on AMD Hackintoshes due to missing intel_fast_memset instructions.
-Run [**this script**](/Resources/Adobe%20patch.sh) or if you prefer to do it manually follow [**this guide**](https://gist.github.com/mikigal/8e1f804fcd7dbafbded2f236653be7c8) to get it working! Remember to reboot your Hackintosh after patching.
+## Adobe Software Fix
 
-If Photoshop crashes while opening image from file you have to downgrade it to version 22.0
+Due to the missing `intel_fast_memset` instruction, Adobe applications crash on AMD Hackintoshes. You can run [**this script**](/Resources/Adobe%20patch.sh) to fix it, or follow [**this tutorial**](https://gist.github.com/mikigal/8e1f804fcd7dbafbded2f236653be7c8) to fix it manually! Remember to restart the system after patching.
+
+If Photoshop crashes when opening images from a file, you must downgrade it to version 22.0.
 
 ## Virtualization
-Firstly you have to enable `SVM` in your BIOS settings. \
-Parallels Desktop (only up to 13.1, newer version require AppleHV) and VirtualBox (it works much worse than Parallels) are only compatible software for virtual machines. There's also VMWare Fusion 10, but it's totally broken on Big Sur, on Catalina it needs [**this workaround**](https://posts.boy.sh/vmware-fusion-catalina) \
-Docker also does not work - you have to use Docker Toolbox instead, but it does not have all Docker's features.
 
-On Big Sur (11.0) Parallel's won't start - it will show `Required components are missing from the OS` error due to changed versions number schema. You have to run installer from with `SYSTEM_VERSION_COMPAT=1` parameter. \
-Open your Terminal app and run Parallel's installer like this: `SYSTEM_VERSION_COMPAT=1 open /Volumes/Parallels\ Desktop\ 13.1.0/Install.app/`, just replace volume's name to proper for your Parallel's DMG. \
-Same problem will exist while trying to start installed Parallels - you can run it every time with the same way as installer or use my launcher (it simply starts Parallels with required parameter) - you can get it [**here**](/Resources/Parallels%20Desktop%20Launcher.app.zip)
+First, you must enable `SVM` in the BIOS settings.
+Parallels Desktop (only version 13.1, newer versions require AppleHV) and VirtualBox (which works much worse than Parallels) are supported.
+VMWare Fusion 10 does not work on Big Sur. On Catalina, it requires this [**workaround**](https://posts.boy.sh/vmware-fusion-catalina). \
+Docker also doesn't work properly. You must use Docker Toolbox, but it doesn't have all the features of Docker.
 
-Parallels 13.1 support only Windows 10 Anniversary Update (build 1607) and older versions. Newer versions stuck while installing. Also I recommend using Windows 7 - it works much better. Do not use automatical installation feature - it caused some issue for me.
+On Big Sur (11.0), Parallels fails to start normally and prompts `Required components are missing from the OS` error. You must add the `SYSTEM_VERSION_COMPAT=1` parameter during installation. \
+Run the following command in the terminal: `SYSTEM_VERSION_COMPAT=1 open /Volumes/Parallels\ Desktop\ 13.1.0/Install.app/`, replace the path with the location of the Parallels installer file. \
 
-**DO NOT** add too much resources to virtual machines, it causes performance issues independently of host specification. \
-I tested lot of VM configurations - the best performance results gives:
-  - Parallels Desktop 13.1
-  - 4 CPU cores
-  - 4GB RAM
-  - 1GB VRAM
-  - 3D Acceleration: DirectX 9
-  - OS: Windows 7 (SP1, build 7601) with disabled Aero theme
+The same error occurs when starting Parallels after installation. You can either add the same parameter every time you start it, or use a launcher made by experts. [**Download**](/Resources/Parallels%20Desktop%20Launcher.app.zip)
 
-With above configuration system is generally responsive, it runs simple games (e. g. The Binding of Isaac: Repentace) smoothly too. All Parallels host-integration features works great.
+Parallels 13.1 only supports Windows 10 version 1607 and older. Newer versions get stuck during installation. Using Windows 7 is recommended for better performance. Do not use the automatic installation feature.
 
-If guest OS does not see USB device reconnecting it to another port usually solve this issue. \
-If [**Coherence Mode**](https://www.parallels.com/blogs/how-to-use-coherence-mode-in-parallels-desktop/) does not work you have to disable guest's antivirus or add these files to it's exclusions list:
+Do not assign too many resources to the VM, as it can cause performance issues.
+I tested many VM configurations - the best performance results were as follows:
+
+Parallels Desktop 13.1
+4 CPU Cores
+4GB RAM
+1GB VRAM
+3D Acceleration: DirectX 9
+OS: Windows 7 (SP1, Build 7601) with Aero themes disabled.
+
+If the VM OS cannot see USB devices, try reconnecting them to a different port; this usually solves the problem.
+If [**Coherence Mode**](https://www.parallels.com/blogs/how-to-use-coherence-mode-in-parallels-desktop/) doesn't work, you must disable the VM's antivirus software or add the following files to its exclusion list:
+
   - `C:\Program Files (x86)\Parallels\Parallels Tools\Services\coherence.exe`
   - `C:\Program Files (x86)\Parallels\Parallels Tools\Services\prl_hook.dll`
 
-## Guides
-**If you have any problems with installation or booting your macOS, kernel panics or another system related issue check OC configuration guide**
+## Installation Guides
+**If you encounter any issues during installation or booting macOS, kernel panics, or other system-related problems, please check the OC Configuration Guide**
 
-**If something else does not work properly (for example USB ports, iServices, DRM/Netflix) check Post-Install guide**
+**If other things aren't working correctly (e.g., USB ports, iServices, DRM/Netflix), please check the Post-Install Guide**
 
- - Creating USB installer: [**\*click\***](https://dortania.github.io/OpenCore-Install-Guide/installer-guide/)
- - OpenCore configuration: [**\*click\***](https://dortania.github.io/OpenCore-Install-Guide/AMD/zen.html)
- - Post-Install: [**\*click\***](https://dortania.github.io/OpenCore-Post-Install/)
- - Troubleshooting: [**\*click\***](https://dortania.github.io/OpenCore-Post-Install/)
- - ACPI patching: [**\*click\***](https://dortania.github.io/Getting-Started-With-ACPI/)
- - USB mapping: [**\*click\***](https://dortania.github.io/OpenCore-Post-Install/usb/)
-
-
-
-
-
+- Creating a USB Installer: [**\*Click\***](https://dortania.github.io/OpenCore-Install-Guide/installer-guide/)
+- OpenCore Configuration: [**\*Click\***](https://dortania.github.io/OpenCore-Install-Guide/AMD/zen.html)
+- Post-Installation: [**\*Click\***](https://dortania.github.io/OpenCore-Post-Install/)
+- Troubleshooting: [**\*Click\***](https://dortania.github.io/OpenCore-Post-Install/)
+- ACPI Patching: [**\*Click\***](https://dortania.github.io/Getting-Started-With-ACPI/)
+- USB Mapping: [**\*Click\***](https://dortania.github.io/OpenCore-Post-Install/usb/)
