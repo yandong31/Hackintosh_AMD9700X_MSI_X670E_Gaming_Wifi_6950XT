@@ -137,7 +137,7 @@ The Shaneee version of the PAT patch is enabled by default, which can provide be
 
 ## Sleep Information
 
-If you have sleep issues, first customize your USB ports. Customization method [**refer here**](https://dortania.github.io/OpenCore-Post-Install/usb/). If customizing USB still doesn't resolve the issue, you should try fixing USB via SSDT.
+If you have sleep issues, first customize your USB ports. Customization method [**refer here**](https://github.com/5T33Z0/OC-Little-Translated/blob/main/Content/03_USB_Fixes/ACPI_Mapping_USB_Ports/XHUB_Method/README.md). If customizing USB still doesn't resolve the issue, you should try fixing USB via SSDT.
 
 There are patches in SSDT-SLEEP.aml for patching the `_STA` method. The patches are applied to the `_SB.PCI0.GPP2.PTXH` and `_SB.PCI0.GP17.XHC0` USB controllers. If your USB controllers have other addresses, you must add them to the SSDT. The patch only affects macOS, so USB on other systems is unaffected.
 

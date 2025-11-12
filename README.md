@@ -141,7 +141,7 @@ PAT补丁默认启用的是Shaneee版本，可以提供显卡的性能，但同�
 
 ## 睡眠信息
 
-如果你有睡眠问题，首先请定制你的USB端口，定制方法 [**参考这里**](https://dortania.github.io/OpenCore-Post-Install/usb/)，如果定制USB仍然存在问题，你应该尝试通过SSDT来修复USB。
+如果你有睡眠问题，首先请定制你的USB端口，定制方法 [**参考这里**](https://github.com/5T33Z0/OC-Little-Translated/blob/main/Content/03_USB_Fixes/ACPI_Mapping_USB_Ports/XHUB_Method/README.md)，如果定制USB仍然存在问题，你应该尝试通过SSDT来修复USB。
 
 在SSDT-SLEEP.aml中有用于修补_STA方法的补丁。补丁适用于_SB.PCI0.GPP2.PTXH和_SB.PCI0.GP17.XHC0USB控制器，如果你的USB控制器还有其他地址，你必须在SSDT添加。补丁程序仅适用于macOS，因此其他系统上的USB不受此补丁的影响。
 
